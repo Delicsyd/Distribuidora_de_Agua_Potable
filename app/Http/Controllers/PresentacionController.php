@@ -14,7 +14,7 @@ class PresentacionController extends DemoCrudController
     protected array $campos = [
         'nombre' => ['etiqueta' => 'Nombre', 'tipo' => 'text', 'obligatorio' => true],
         'descripcion' => ['etiqueta' => 'Descripción', 'tipo' => 'textarea'],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Imagen de la presentación', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

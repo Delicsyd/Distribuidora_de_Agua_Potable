@@ -3,21 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;    
 
 class CategoriaController extends DemoCrudController
 {
-    protected string $modulo = 'categorías';
-    protected string $ruta = '/categorias';
+    protected string $modulo = 'categorías';    protected string $ruta = '/categorias';
     protected string $vista = 'categorias';
     protected string $modelo = Categoria::class;
     protected array $campos = [
         'nombre' => ['etiqueta' => 'Nombre', 'tipo' => 'text', 'obligatorio' => true],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Imagen representativa', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 
-    public function listar() { return $this->ver('listado', ['registros' => $this->registrosDePrueba()]); }
+    public function listar()
+    {
+        return $this->ver('listado', ['registros' => Categoria::orderBy('id')->get(),
+    ]);
+}
     public function vistaFormulario() { return $this->ver('registro'); }
     public function registrar(Request $request) { return $this->respuestaDemo('REGISTRADA'); }
     public function vistaEdicion(Request $request) { return $this->ver('edicion', ['registro' => $this->registroDePrueba($request->id ?? 1)]); }

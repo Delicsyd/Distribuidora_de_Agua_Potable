@@ -18,7 +18,7 @@ class PedidoController extends DemoCrudController
         'iva' => ['etiqueta' => 'IVA', 'tipo' => 'number'],
         'descuento' => ['etiqueta' => 'Descuento', 'tipo' => 'number'],
         'total' => ['etiqueta' => 'Total', 'tipo' => 'number', 'obligatorio' => true],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Comprobante del pedido', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

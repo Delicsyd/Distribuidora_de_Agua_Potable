@@ -13,7 +13,7 @@ class RolController extends DemoCrudController
     protected string $modelo = Rol::class;
     protected array $campos = [
         'nombre' => ['etiqueta' => 'Nombre', 'tipo' => 'text'],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Icono del rol', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

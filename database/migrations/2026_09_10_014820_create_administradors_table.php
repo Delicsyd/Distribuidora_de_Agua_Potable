@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('usuario')->unique();
             $table->string('contraseña');
             $table->string('url_imagen');
-            $table->foreignId('rol');
-             $table->string('telefono')->unique();
+            $table->foreignId('rol_id');
+            $table->string('telefono')->unique();
             $table->string('direccion')->nullable();
             $table->string('estado');
             $table->timestamps();

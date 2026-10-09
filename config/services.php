@@ -13,6 +13,14 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'google'=>[
+        'client_id'=> env('GOOGLE_CLIENT_ID'),
+        'client_secret'=> env('GOOGLE_CLIENT_SECRET'),
+        'redirect'=> env('GOOGLE_REDIRECT_URI'),
+
+
+
+    ],
 
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
@@ -28,6 +36,17 @@ return [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key' => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+    ],
+
+    'geolocalizacion' => [
+        'ip' => env('GEOLOCALIZACION_IP'),
     ],
 
 ];

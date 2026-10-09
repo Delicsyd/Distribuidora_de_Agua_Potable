@@ -17,7 +17,7 @@ class ProductoPedidoController extends DemoCrudController
         'cantidad' => ['etiqueta' => 'Cantidad', 'tipo' => 'number', 'obligatorio' => true],
         'precio' => ['etiqueta' => 'Precio', 'tipo' => 'number', 'obligatorio' => true],
         'descuento' => ['etiqueta' => 'Descuento', 'tipo' => 'number'],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Imagen del producto', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

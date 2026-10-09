@@ -62,3 +62,9 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Carga de imágenes con Cloudinary
+
+Configura `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` en `.env`. Los formularios de productos y clientes aceptan imágenes JPG, PNG o WEBP de hasta 5 MB y las envían a Cloudinary. Al terminar, la página muestra una vista previa y el enlace público devuelto por Cloudinary.
+
+Para comprobar la conexión manualmente, abre `/prueba-cloudinary` y sube una imagen. Si cambias las credenciales mientras la aplicación está ejecutándose, limpia la configuración en caché con `php artisan config:clear`.

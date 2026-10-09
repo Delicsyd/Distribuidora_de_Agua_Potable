@@ -17,7 +17,7 @@ class EntregaController extends DemoCrudController
         'direccion_id' => ['etiqueta' => 'Dirección', 'tipo' => 'select', 'obligatorio' => true],
         'fecha' => ['etiqueta' => 'Fecha', 'tipo' => 'date', 'obligatorio' => true],
         'hora' => ['etiqueta' => 'Hora', 'tipo' => 'time'],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Fotografía de entrega', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

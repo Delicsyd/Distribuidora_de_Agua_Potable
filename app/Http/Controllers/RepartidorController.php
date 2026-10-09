@@ -16,7 +16,7 @@ class RepartidorController extends DemoCrudController
         'apellidos' => ['etiqueta' => 'Apellidos', 'tipo' => 'text', 'obligatorio' => true],
         'telefono' => ['etiqueta' => 'Teléfono', 'tipo' => 'tel', 'obligatorio' => true],
         'licencia' => ['etiqueta' => 'Licencia', 'tipo' => 'text', 'obligatorio' => true],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Fotografía del repartidor', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

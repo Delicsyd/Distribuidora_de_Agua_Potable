@@ -19,7 +19,7 @@ class DireccionController extends DemoCrudController
         'ciudad' => ['etiqueta' => 'Ciudad', 'tipo' => 'text', 'obligatorio' => true],
         'codigo_postal' => ['etiqueta' => 'Código postal', 'tipo' => 'text', 'obligatorio' => true],
         'referencia' => ['etiqueta' => 'Referencia', 'tipo' => 'textarea'],
-        'imagen' => ['etiqueta' => 'Imagen', 'tipo' => 'text'],
+        'imagen' => ['etiqueta' => 'Fotografía de referencia del domicilio', 'tipo' => 'image'],
         'estado' => ['etiqueta' => 'Estado', 'tipo' => 'select'],
     ];
 

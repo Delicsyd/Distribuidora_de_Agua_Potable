@@ -10,7 +10,25 @@
             <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Registrar {{ $modulo }}</h1>
         </div>
 
-        <form action="{{ url($ruta.'/guardar') }}" method="POST">
+        @if (session('status'))
+            <div class="mb-6 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800" role="status">
+                {{ session('status') }}
+            </div>
+        @endif
+        @if (session('uploadedImages'))
+            <div class="mb-6 space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                <p class="font-semibold text-emerald-900">Imágenes guardadas en Cloudinary:</p>
+                @foreach (session('uploadedImages') as $campo => $url)
+                    <div class="flex flex-wrap items-center gap-3 text-sm">
+                        <span>{{ $campos[$campo]['etiqueta'] ?? $campo }}</span>
+                        <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="text-cyan-700 underline">Abrir imagen</a>
+                        <img src="{{ $url }}" alt="{{ $campos[$campo]['etiqueta'] ?? $campo }}" class="h-16 w-16 rounded object-cover">
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <form action="{{ url($ruta.'/guardar') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 @foreach ($campos as $nombre => $campo)
@@ -26,15 +44,16 @@
                         @elseif ($campo['tipo'] === 'select')
                             <select id="{{ $nombre }}" name="{{ $nombre }}" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                                 <option value="">Selecciona una opción</option>
-                                @if (isset($campo['opciones']))
-                                    @foreach ($campo['opciones'] as $opcion)
-                                        <option value="{{ $opcion }}">{{ $opcion }}</option>
-                                    @endforeach
-                                @else
-                                    <option value="1">Opción de ejemplo 1</option>
-                                    <option value="2">Opción de ejemplo 2</option>
-                                @endif
+                                @foreach ($campo['opciones'] as $valor => $etiqueta)
+                                    <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                                @endforeach
                             </select>
+                        @elseif ($campo['tipo'] === 'image')
+                            <div data-image-field>
+                                <input type="file" id="{{ $nombre }}" name="{{ $nombre }}" accept="image/*" data-image-input @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Selecciona una imagen desde tu dispositivo.</p>
+                                <img data-image-preview alt="Vista previa de {{ strtolower($campo['etiqueta']) }}" class="mt-3 hidden max-h-48 rounded-lg object-contain">
+                            </div>
                         @else
                             <input type="{{ $campo['tipo'] }}" id="{{ $nombre }}" name="{{ $nombre }}" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                         @endif
