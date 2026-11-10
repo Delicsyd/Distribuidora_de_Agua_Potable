@@ -12,16 +12,26 @@
 
         <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             @foreach ($campos as $nombre => $campo)
-                <div>
-                    <dt class="mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $campo['etiqueta'] }}</dt>
-                    <dd class="rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ $campo['tipo'] === 'password' ? '••••••' : ($registro[$nombre] ?? '—') }}</dd>
-                </div>
+                @if ($campo['tipo'] !== 'password')
+                    <div>
+                        <dt class="mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $campo['etiqueta'] }}</dt>
+                        <dd class="rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                            @if ($campo['tipo'] === 'image' && !empty($registro[$nombre]))
+                                <img src="{{ $registro[$nombre] }}" alt="{{ $campo['etiqueta'] }}" class="h-24 w-24 rounded object-cover">
+                            @elseif ($nombre === 'estado' && in_array($modulo, ['clientes', 'categorias', 'marcas', 'presentaciones', 'productos', 'roles'], true))
+                                {{ $registro[$nombre] ? 'Activo' : 'Inactivo' }}
+                            @else
+                                {{ $registro[$nombre] ?? '—' }}
+                            @endif
+                        </dd>
+                    </div>
+                @endif
             @endforeach
         </dl>
 
         <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-200 pt-6 dark:border-slate-700">
-            <a href="{{ url($ruta.'/editar?id='.$registro['id']) }}" class="rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400">Editar</a>
-            <form action="{{ url($ruta.'/borrar') }}" method="POST">
+            <a href="{{ url($ruta.'/editar/'.$registro['id']) }}" class="rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400">Editar</a>
+            <form action="{{ url($ruta.'/borrar/'.$registro['id']) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <input type="hidden" name="id" value="{{ $registro['id'] }}">

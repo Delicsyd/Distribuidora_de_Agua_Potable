@@ -12,8 +12,15 @@ class Presentacion extends Model
         'nombre',
         'descripcion',
         'imagen',
-        'estado'
+        'estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+        ];
+    }
 
     public function productos()
     {

@@ -2,10 +2,26 @@
 
 namespace Tests\Feature;
 
+use App\Models\Categoria;
+use App\Models\Marca;
+use App\Models\Presentacion;
+use App\Models\Producto;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CatalogFormsTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Categoria::create(['nombre' => 'Agua purificada', 'estado' => true]);
+        Presentacion::create(['nombre' => 'Garrafón de 20 litros', 'estado' => true]);
+        Marca::create(['nombre' => 'Manantial', 'estado' => true]);
+    }
+
     public function test_product_form_uses_multipart_uploads_and_water_catalog_options(): void
     {
         $this->get('/productos/crear')
@@ -51,8 +67,19 @@ class CatalogFormsTest extends TestCase
 
     public function test_product_edit_form_supports_image_files_and_selected_catalog_values(): void
     {
-        $this->get('/productos/editar?id=1')
+        $producto = Producto::create([
+            'nombre' => 'Garrafón',
+            'categoria_id' => Categoria::firstOrFail()->id,
+            'presentacion_id' => Presentacion::firstOrFail()->id,
+            'marca_id' => Marca::firstOrFail()->id,
+            'precio' => 100,
+            'estado' => true,
+        ]);
+
+        $this->get('/productos/editar?id='.$producto->id)
             ->assertOk()
+            ->assertSee('method="POST"', false)
+            ->assertSee('name="_method" value="PUT"', false)
             ->assertSee('enctype="multipart/form-data"', false)
             ->assertSee('name="imagen_secundaria"', false)
             ->assertSee('accept="image/*"', false)

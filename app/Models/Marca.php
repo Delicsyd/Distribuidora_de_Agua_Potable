@@ -11,8 +11,15 @@ class Marca extends Model
     protected $fillable = [
         'nombre',
         'imagen',
-        'estado'
+        'estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+        ];
+    }
 
     public function productos()
     {

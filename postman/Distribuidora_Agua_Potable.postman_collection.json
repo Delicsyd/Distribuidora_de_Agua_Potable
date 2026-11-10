@@ -1,0 +1,2256 @@
+{
+  "info": {
+    "name": "APIs REST Full - Controladores restantes",
+    "description": "Coleccion complementaria a productos. Incluye los CRUD REST de los otros 13 controladores de Distribuidora de Agua Potable. Importar y seleccionar el entorno Distribuidora Agua Potable - Local.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "POST - Crear Roles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API rol {{runId}}\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"runId\", pm.variables.replaceIn(\"{{$guid}}\"));",
+                  "pm.environment.set(\"adminPhone\", \"55\" + Math.floor(10000000 + Math.random() * 89999999));",
+                  "[",
+                  "    \"id_roles\",",
+                  "    \"id_administradores\",",
+                  "    \"id_categorias\",",
+                  "    \"id_presentaciones\",",
+                  "    \"id_marcas\",",
+                  "    \"id_clientes\",",
+                  "    \"id_direcciones\",",
+                  "    \"id_metodos_pago\",",
+                  "    \"id_pedidos\",",
+                  "    \"id_productos_pedido\",",
+                  "    \"id_repartidores\",",
+                  "    \"id_entregas\",",
+                  "    \"id_usuarios\"",
+                  "].forEach((key) => pm.environment.unset(key));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_roles\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Roles por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles/{{id_roles}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_roles\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Roles",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles/{{id_roles}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API rol actualizado {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Administradores",
+      "item": [
+        {
+          "name": "POST - Crear Administradores",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/administradores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API administrador\",\n  \"apellidos\": \"Postman\",\n  \"correo\": \"api-admin-{{runId}}@example.test\",\n  \"usuario\": \"api-admin-{{runId}}\",\n  \"contraseña\": \"Secreta123\",\n  \"url_imagen\": \"https://example.test/admin.png\",\n  \"rol_id\": \"{{id_roles}}\",\n  \"telefono\": \"{{adminPhone}}\",\n  \"direccion\": \"Calle de prueba\",\n  \"estado\": \"activo\",\n  \"contraseña_confirmation\": \"Secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_administradores\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Administradores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/administradores"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Administradores por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/administradores/{{id_administradores}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_administradores\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Administradores",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/administradores/{{id_administradores}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API administrador actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "POST - Crear Categorias",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API categoria {{runId}}\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_categorias\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Categorias por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias/{{id_categorias}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_categorias\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Categorias",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias/{{id_categorias}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API categoria actualizada {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Presentaciones",
+      "item": [
+        {
+          "name": "POST - Crear Presentaciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/presentaciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API presentacion {{runId}}\",\n  \"descripcion\": \"Presentacion creada desde Postman\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_presentaciones\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Presentaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/presentaciones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Presentaciones por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/presentaciones/{{id_presentaciones}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_presentaciones\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Presentaciones",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/presentaciones/{{id_presentaciones}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API presentacion actualizada {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Marcas",
+      "item": [
+        {
+          "name": "POST - Crear Marcas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/marcas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API marca {{runId}}\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_marcas\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Marcas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/marcas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Marcas por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/marcas/{{id_marcas}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_marcas\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Marcas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/marcas/{{id_marcas}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API marca actualizada {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "POST - Crear Clientes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API cliente\",\n  \"apellidos\": \"Postman\",\n  \"correo\": \"api-cliente-{{runId}}@example.test\",\n  \"contraseña\": \"Secreta123\",\n  \"telefono\": \"5523456789\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_clientes\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Clientes por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes/{{id_clientes}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_clientes\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Clientes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes/{{id_clientes}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API cliente actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Direcciones",
+      "item": [
+        {
+          "name": "POST - Crear Direcciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/direcciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": \"{{id_clientes}}\",\n  \"calle\": \"Calle uno\",\n  \"numero\": \"10\",\n  \"colonia\": \"Centro\",\n  \"ciudad\": \"Ciudad de Mexico\",\n  \"codigo_postal\": \"06000\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_direcciones\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Direcciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/direcciones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Direcciones por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/direcciones/{{id_direcciones}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_direcciones\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Direcciones",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/direcciones/{{id_direcciones}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calle\": \"Calle dos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Metodos de pago",
+      "item": [
+        {
+          "name": "POST - Crear Metodos de pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/metodos-pago",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API pago {{runId}}\",\n  \"descripcion\": \"Pago de prueba\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_metodos_pago\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Metodos de pago",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/metodos-pago"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Metodos de pago por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/metodos-pago/{{id_metodos_pago}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_metodos_pago\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Metodos de pago",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/metodos-pago/{{id_metodos_pago}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"API pago actualizado {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "POST - Crear Pedidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pedidos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": \"{{id_clientes}}\",\n  \"metodo_pago_id\": \"{{id_metodos_pago}}\",\n  \"fecha\": \"2026-10-29\",\n  \"iva\": 0,\n  \"descuento\": 0,\n  \"total\": 125,\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_pedidos\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pedidos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Pedidos por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pedidos/{{id_pedidos}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_pedidos\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Pedidos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pedidos/{{id_pedidos}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total\": 150\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Productos de pedido",
+      "item": [
+        {
+          "name": "POST - Crear Productos de pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos-pedido",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido_id\": \"{{id_pedidos}}\",\n  \"producto_id\": \"{{id_productos}}\",\n  \"cantidad\": 1,\n  \"precio\": 125,\n  \"descuento\": 0,\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_productos_pedido\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Productos de pedido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos-pedido"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Productos de pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos-pedido/{{id_productos_pedido}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_productos_pedido\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Productos de pedido",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos-pedido/{{id_productos_pedido}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Repartidores",
+      "item": [
+        {
+          "name": "POST - Crear Repartidores",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/repartidores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API repartidor\",\n  \"apellidos\": \"Postman\",\n  \"telefono\": \"5534567890\",\n  \"licencia\": \"API-LIC-{{runId}}\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_repartidores\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Repartidores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/repartidores"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Repartidores por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/repartidores/{{id_repartidores}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_repartidores\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Repartidores",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/repartidores/{{id_repartidores}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"API repartidor actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Entregas",
+      "item": [
+        {
+          "name": "POST - Crear Entregas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido_id\": \"{{id_pedidos}}\",\n  \"repartidor_id\": \"{{id_repartidores}}\",\n  \"direccion_id\": \"{{id_direcciones}}\",\n  \"fecha\": \"2026-10-29\",\n  \"hora\": \"10:30:00\",\n  \"estado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_entregas\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Entregas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Entregas por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas/{{id_entregas}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_entregas\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Entregas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas/{{id_entregas}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hora\": \"11:30:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "POST - Crear Usuarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API usuario\",\n  \"email\": \"api-user-{{runId}}@example.test\",\n  \"password\": \"Secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creado: HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.data.id).to.exist;",
+                  "pm.environment.set(\"id_usuarios\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Listado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.be.an(\"array\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - Consultar Usuarios por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{id_usuarios}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Consulta: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data.id).to.eql(Number(pm.environment.get(\"id_usuarios\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - Actualizar Usuarios",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{id_usuarios}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API usuario actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Actualizado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().data).to.have.property(\"id\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eliminar registros (al final)",
+      "description": "Se ejecuta en orden inverso para respetar las relaciones entre tablas.",
+      "item": [
+        {
+          "name": "DELETE - Eliminar Usuarios",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{id_usuarios}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Entregas",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas/{{id_entregas}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Repartidores",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/repartidores/{{id_repartidores}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Productos de pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos-pedido/{{id_productos_pedido}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Pedidos",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pedidos/{{id_pedidos}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Metodos de pago",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/metodos-pago/{{id_metodos_pago}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Direcciones",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/direcciones/{{id_direcciones}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Clientes",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes/{{id_clientes}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Marcas",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/marcas/{{id_marcas}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Presentaciones",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/presentaciones/{{id_presentaciones}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Categorias",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias/{{id_categorias}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Administradores",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/administradores/{{id_administradores}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Eliminar Roles",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles/{{id_roles}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Eliminado: HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.expect(pm.response.json().message).to.eql(\"Registro eliminado correctamente.\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

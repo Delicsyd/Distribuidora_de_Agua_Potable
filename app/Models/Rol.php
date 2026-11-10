@@ -13,4 +13,16 @@ class Rol extends Model
         'imagen',
         'estado'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+        ];
+    }
+
+    public function administradores()
+    {
+        return $this->hasMany(Administrador::class, 'rol_id');
+    }
 }

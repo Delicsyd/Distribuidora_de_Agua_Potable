@@ -2,24 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Categoria;
+use App\Models\Marca;
+use App\Models\Presentacion;
 use App\Services\CloudinaryImageService;
+use Cloudinary\Api\Exception\ApiError;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 abstract class DemoCrudController extends Controller
 {
     protected string $modulo;
+
     protected string $ruta;
+
     protected string $vista;
+
     protected string $modelo;
+
     protected array $campos = [];
+
+    protected function validar(Request $request, array $reglas, array $mensajes = []): array
+    {
+        return Validator::make($request->all(), $reglas, $mensajes)->validate();
+    }
 
     protected function datosVista(array $adicionales = []): array
     {
+        $campos = $this->camposConOpciones();
+        $opcionesFaltantes = collect($campos)
+            ->filter(fn (array $campo) => $campo['tipo'] === 'select'
+                && ! empty($campo['obligatorio'])
+                && empty($campo['opciones']))
+            ->pluck('etiqueta')
+            ->values()
+            ->all();
+
         return array_merge([
             'modulo' => $this->modulo,
             'ruta' => $this->ruta,
             'modelo' => class_basename($this->modelo),
-            'campos' => $this->camposConOpciones(),
+            'campos' => $campos,
+            'opcionesFaltantes' => $opcionesFaltantes,
         ], $adicionales);
     }
 
@@ -35,21 +62,57 @@ abstract class DemoCrudController extends Controller
     protected function subirImagenes(Request $request, array $campos): array
     {
         $reglas = array_fill_keys($campos, 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120');
-        $request->validate($reglas);
+        $mensajes = [];
+        foreach ($campos as $campo) {
+            $mensajes[$campo.'.image'] = 'El archivo debe ser una imagen válida.';
+            $mensajes[$campo.'.mimes'] = 'La imagen debe estar en formato JPG, JPEG, PNG o WEBP.';
+            $mensajes[$campo.'.max'] = 'La imagen no debe superar los 5 MB.';
+        }
+        $this->validar($request, $reglas, $mensajes);
 
         $imagenes = [];
         $servicio = app(CloudinaryImageService::class);
 
         foreach ($campos as $campo) {
             if ($request->hasFile($campo)) {
-                $imagenes[$campo] = $servicio->subir(
-                    $request->file($campo),
-                    'distribuidora/'.$this->modulo
-                );
+                try {
+                    $imagenes[$campo] = $servicio->subir(
+                        $request->file($campo),
+                        'distribuidora/'.$this->modulo
+                    );
+                } catch (RuntimeException|ApiError|GuzzleException $exception) {
+                    report($exception);
+
+                    throw ValidationException::withMessages([
+                        $campo => 'No fue posible subir la imagen. Inténtalo de nuevo o elige otro archivo.',
+                    ]);
+                }
             }
         }
 
         return $imagenes;
+    }
+
+    protected function normalizarEstado(mixed $estado, int $predeterminado = 1): int
+    {
+        if ($estado === null || $estado === '') {
+            return $predeterminado;
+        }
+
+        return in_array(strtolower((string) $estado), ['1', 'activo', 'true', 'on'], true) ? 1 : 0;
+    }
+
+    protected function actualizarImagenes(Request $request, array $datos, array $campos): array
+    {
+        $imagenes = $this->subirImagenes($request, $campos);
+
+        foreach ($campos as $campo) {
+            if (! array_key_exists($campo, $imagenes)) {
+                unset($datos[$campo]);
+            }
+        }
+
+        return array_merge($datos, $imagenes);
     }
 
     protected function respuestaConImagenes(string $accion, array $imagenes)
@@ -93,9 +156,6 @@ abstract class DemoCrudController extends Controller
 
             $campo['opciones'] = $this->opcionesPara($nombre);
 
-            if ($campo['opciones'] === []) {
-                throw new \LogicException("No hay opciones configuradas para el campo {$nombre}.");
-            }
         }
 
         return $campos;
@@ -124,6 +184,10 @@ abstract class DemoCrudController extends Controller
                     'surtido' => 'Surtido',
                     'cancelado' => 'Cancelado',
                 ],
+                'clientes', 'categorias', 'marcas', 'presentaciones', 'productos' => [
+                    1 => 'Activo',
+                    0 => 'Inactivo',
+                ],
                 default => [
                     'activo' => 'Activo',
                     'inactivo' => 'Inactivo',
@@ -132,21 +196,9 @@ abstract class DemoCrudController extends Controller
         }
 
         return match ($nombre) {
-            'categoria_id' => [
-                1 => 'Agua purificada',
-                2 => 'Agua mineral',
-                3 => 'Accesorios para agua',
-            ],
-            'presentacion_id' => [
-                1 => 'Garrafón de 20 litros',
-                2 => 'Botella de 1 litro',
-                3 => 'Paquete de botellas de 600 ml',
-            ],
-            'marca_id' => [
-                1 => 'Agua Clara',
-                2 => 'Manantial',
-                3 => 'Pura Vida',
-            ],
+            'categoria_id' => Categoria::query()->orderBy('nombre')->pluck('nombre', 'id')->all(),
+            'presentacion_id' => Presentacion::query()->orderBy('nombre')->pluck('nombre', 'id')->all(),
+            'marca_id' => Marca::query()->orderBy('nombre')->pluck('nombre', 'id')->all(),
             'cliente_id' => [
                 1 => 'María López',
                 2 => 'Carlos Hernández',

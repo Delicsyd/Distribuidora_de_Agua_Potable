@@ -48,5 +48,14 @@ return [
     'geolocalizacion' => [
         'ip' => env('GEOLOCALIZACION_IP'),
     ],
+    
+    'unsplash' => [
+    'access_key' => env('UNSPLASH_ACCESS_KEY'),
+],
+
+'api_admin' => [
+    'url' => env('API_ADMIN_URL', 'http://127.0.0.1:8001/api'),
+    'token' => env('API_ADMIN_TOKEN'),
+],
 
 ];

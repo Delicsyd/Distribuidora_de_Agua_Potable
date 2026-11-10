@@ -15,9 +15,10 @@
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Completa los datos del nuevo administrador.</p>
         </div>
 
-        @if (session('success'))
-            <div class="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-gray-800 dark:text-green-400">
-                {{ session('success') }}
+        @if ($roles->isEmpty())
+            <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800" role="alert">
+                Registra primero un rol para poder asignarlo a un administrador.
+                <a href="{{ url('/roles/crear') }}" class="font-semibold underline">Crear rol</a>
             </div>
         @endif
 
@@ -67,14 +68,14 @@
                 </div>
 
                 <div>
-                    <label for="rol" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Rol <span class="text-red-500">*</span></label>
-                    <select id="rol" name="rol" required class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <label for="rol_id" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Rol <span class="text-red-500">*</span></label>
+                    <select id="rol_id" name="rol_id" required @disabled($roles->isEmpty()) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                         <option value="">-- Seleccione un rol --</option>
                         @foreach ($roles as $rol)
-                            <option value="{{ $rol->id ?? $rol['id'] }}" @selected(old('rol') == ($rol->id ?? $rol['id']))>{{ $rol->nombre ?? $rol['nombre'] }}</option>
+                            <option value="{{ $rol->id }}" @selected(old('rol_id') == $rol->id)>{{ $rol->nombre }}</option>
                         @endforeach
                     </select>
-                    @error('rol')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                    @error('rol_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
                 <div>

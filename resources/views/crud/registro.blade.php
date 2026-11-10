@@ -10,9 +10,20 @@
             <h1 class="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Registrar {{ $modulo }}</h1>
         </div>
 
+        @if (!empty($opcionesFaltantes))
+            <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800" role="alert">
+                Registra primero estas opciones relacionadas para continuar: {{ implode(', ', $opcionesFaltantes) }}.
+            </div>
+        @endif
+
         @if (session('status'))
             <div class="mb-6 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800" role="status">
                 {{ session('status') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+                {{ session('error') }}
             </div>
         @endif
         @if (session('uploadedImages'))
@@ -26,7 +37,19 @@
                     </div>
                 @endforeach
             </div>
+
         @endif
+
+        @if ($errors->any())
+    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <p class="mb-2 font-semibold">Revisa los siguientes errores:</p>
+        <ul class="list-inside list-disc">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
         <form action="{{ url($ruta.'/guardar') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -40,12 +63,12 @@
                             @endif
                         </label>
                         @if ($campo['tipo'] === 'textarea')
-                            <textarea id="{{ $nombre }}" name="{{ $nombre }}" rows="3" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"></textarea>
+                            <textarea id="{{ $nombre }}" name="{{ $nombre }}" rows="3" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ old($nombre) }}</textarea>
                         @elseif ($campo['tipo'] === 'select')
                             <select id="{{ $nombre }}" name="{{ $nombre }}" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                                <option value="">Selecciona una opción</option>
+                                <option value="" @selected(old($nombre) === null || old($nombre) === '')>Selecciona una opción</option>
                                 @foreach ($campo['opciones'] as $valor => $etiqueta)
-                                    <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                                    <option value="{{ $valor }}" @selected((string) old($nombre) === (string) $valor)>{{ $etiqueta }}</option>
                                 @endforeach
                             </select>
                         @elseif ($campo['tipo'] === 'image')
@@ -55,13 +78,16 @@
                                 <img data-image-preview alt="Vista previa de {{ strtolower($campo['etiqueta']) }}" class="mt-3 hidden max-h-48 rounded-lg object-contain">
                             </div>
                         @else
-                            <input type="{{ $campo['tipo'] }}" id="{{ $nombre }}" name="{{ $nombre }}" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                            <input type="{{ $campo['tipo'] }}" id="{{ $nombre }}" name="{{ $nombre }}" value="{{ $campo['tipo'] === 'password' ? '' : old($nombre) }}" @required(!empty($campo['obligatorio'])) class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                         @endif
+                        @error($nombre)
+                            <p class="mt-1 text-sm text-red-600" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
                 @endforeach
             </div>
             <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-200 pt-6 dark:border-slate-700">
-                <button type="submit" class="rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400">Registrar</button>
+                <button type="submit" @disabled(!empty($opcionesFaltantes)) class="rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50">Registrar</button>
                 <a href="{{ url($ruta.'/listar') }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">Volver al listado</a>
             </div>
         </form>

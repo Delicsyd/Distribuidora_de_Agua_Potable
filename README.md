@@ -68,3 +68,42 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 Configura `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` en `.env`. Los formularios de productos y clientes aceptan imágenes JPG, PNG o WEBP de hasta 5 MB y las envían a Cloudinary. Al terminar, la página muestra una vista previa y el enlace público devuelto por Cloudinary.
 
 Para comprobar la conexión manualmente, abre `/prueba-cloudinary` y sube una imagen. Si cambias las credenciales mientras la aplicación está ejecutándose, limpia la configuración en caché con `php artisan config:clear`.
+
+## API REST administrativa
+
+La aplicación está desarrollada en **PHP 8.2 o superior** con el framework **Laravel 12**. La API REST reutiliza los modelos y la conexión a la base de datos configurada en `.env`; verifica que `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD` apunten a la misma base de datos del proyecto.
+
+Laravel Sanctum ya está instalado en este proyecto. El comando `php artisan install:api` se usa al configurar Sanctum en una instalación que aún no lo tiene; no es necesario volver a ejecutarlo aquí porque ya existen las rutas y migraciones de API.
+
+Inicia la aplicación local con:
+
+```bash
+php artisan serve
+```
+
+La colección Postman está en [`postman/Distribuidora_Agua_Potable.postman_collection.json`](postman/Distribuidora_Agua_Potable.postman_collection.json) y el entorno de ejemplo en [`postman/Local.postman_environment.json`](postman/Local.postman_environment.json). Impórtalos en Postman, selecciona el entorno **Distribuidora Agua Potable - Local** y ejecuta la colección completa en orden con un retraso de **1100 ms** entre solicitudes (la API limita las solicitudes a 60 por minuto). Los cuerpos JSON incluyen los datos de muestra; la colección crea primero los registros relacionados y los elimina al final. Para repetir la ejecución, vuelve a ejecutar la colección completa.
+
+Todos los recursos tienen operaciones `GET` (listado y consulta por ID), `POST` (crear), `PUT` (actualización parcial con los campos enviados) y `DELETE` (eliminar). Las respuestas usan JSON; los datos inválidos regresan `422` con el detalle en `errors`, y los IDs inexistentes regresan `404`.
+
+| Recurso | Ruta base |
+| --- | --- |
+| Roles | `/api/roles` |
+| Administradores | `/api/administradores` |
+| Categorías | `/api/categorias` |
+| Presentaciones | `/api/presentaciones` |
+| Marcas | `/api/marcas` |
+| Productos | `/api/productos` |
+| Clientes | `/api/clientes` |
+| Direcciones | `/api/direcciones` |
+| Métodos de pago | `/api/metodos-pago` |
+| Pedidos | `/api/pedidos` |
+| Productos de pedido | `/api/productos-pedido` |
+| Repartidores | `/api/repartidores` |
+| Entregas | `/api/entregas` |
+| Usuarios | `/api/usuarios` |
+
+Para comprobar la API sin Postman, ejecuta las pruebas CRUD contra la base de datos SQLite en memoria:
+
+```bash
+php artisan test --filter=ApiCrudTest
+```

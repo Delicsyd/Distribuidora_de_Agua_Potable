@@ -18,6 +18,11 @@ return [
             'driver' => 'session',
             'provider' => 'administradores',
         ],
+        
+        'admin_api' => [
+    'driver' => 'sanctum',
+    'provider' => 'administradores',
+],
 
     ],
 

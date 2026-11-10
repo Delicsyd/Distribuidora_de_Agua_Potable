@@ -15,8 +15,19 @@ class Cliente extends Model
         'contraseña',
         'telefono',
         'imagen',
-        'estado'
+        'estado',
     ];
+
+    protected $hidden = [
+        'contraseña',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'estado' => 'boolean',
+        ];
+    }
 
     public function direcciones()
     {

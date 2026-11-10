@@ -17,7 +17,7 @@
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Actualiza la información del administrador.</p>
         </div>
 
-        <form action="{{ url('/admin/actualizar') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ url('/admin/actualizar/'.$administrador->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -37,13 +37,14 @@
                 @endforeach
 
                 <div>
-                    <label for="rol" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Rol <span class="text-red-500">*</span></label>
-                    <select id="rol" name="rol" required class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <label for="rol_id" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Rol <span class="text-red-500">*</span></label>
+                    <select id="rol_id" name="rol_id" required class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                         <option value="">-- Seleccione un rol --</option>
                         @foreach ($roles as $rol)
-                            <option value="{{ $rol->id ?? $rol['id'] }}" @selected($value('rol') == ($rol->id ?? $rol['id']))>{{ $rol->nombre ?? $rol['nombre'] }}</option>
+                            <option value="{{ $rol->id }}" @selected($value('rol_id') == $rol->id)>{{ $rol->nombre }}</option>
                         @endforeach
                     </select>
+                    @error('rol_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
                 <div>
@@ -52,6 +53,7 @@
                         <option value="1" @selected($value('estado', '1') == '1')>Activo</option>
                         <option value="0" @selected($value('estado') === '0')>Inactivo</option>
                     </select>
+                    @error('estado')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="sm:col-span-2">
@@ -62,11 +64,21 @@
                 <div>
                     <label for="contraseña" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Nueva contraseña</label>
                     <input type="password" id="contraseña" name="contraseña" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    @error('contraseña')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label for="contraseña_confirmation" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Confirmar nueva contraseña</label>
+                    <input type="password" id="contraseña_confirmation" name="contraseña_confirmation" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                 </div>
 
                 <div>
                     <label for="url_imagen" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Imagen de perfil</label>
                     <input type="file" id="url_imagen" name="url_imagen" accept="image/png,image/jpeg,image/webp" class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                    @if ($administrador->url_imagen)
+                        <img src="{{ $administrador->url_imagen }}" alt="Imagen actual del administrador" class="mt-3 h-20 w-20 rounded-full object-cover">
+                    @endif
+                    @error('url_imagen')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
             </div>
 

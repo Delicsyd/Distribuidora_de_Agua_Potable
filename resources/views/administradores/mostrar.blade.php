@@ -23,7 +23,6 @@
                 ['usuario', 'Usuario'],
                 ['correo', 'Correo electrónico'],
                 ['telefono', 'Teléfono'],
-                ['rol', 'Rol'],
                 ['estado', 'Estado'],
                 ['direccion', 'Dirección'],
             ] as [$name, $label])
@@ -34,15 +33,28 @@
                     </div>
                 </div>
             @endforeach
+            <div>
+                <label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Rol</label>
+                <div class="min-h-10 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {{ $administrador->rol?->nombre ?? 'No registrado' }}
+                </div>
+            </div>
         </div>
 
+        @if ($administrador->url_imagen)
+            <div class="mt-5">
+                <p class="mb-2 text-sm font-medium text-gray-900 dark:text-white">Imagen de perfil</p>
+                <img src="{{ $administrador->url_imagen }}" alt="Imagen de {{ $administrador->nombres }}" class="h-24 w-24 rounded-full object-cover">
+            </div>
+        @endif
+
         <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-200 pt-6 dark:border-slate-700">
-            <form action="{{ url('/admin/borrar') }}" method="POST">
+            <form action="{{ url('/admin/borrar/'.$administrador->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Borrar administrador</button>
             </form>
-            <a href="{{ url('/admin/editar') }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">Editar</a>
+            <a href="{{ url('/admin/editar/'.$administrador->id) }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">Editar</a>
             <a href="{{ url('/admin/listar') }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">Volver al listado</a>
         </div>
     </div>

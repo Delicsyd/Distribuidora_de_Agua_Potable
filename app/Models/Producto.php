@@ -20,8 +20,18 @@ class Producto extends Model
         'imagen',
         'imagen_secundaria',
         'imagen_terciaria',
-        'estado'
+        'estado',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'precio' => 'decimal:2',
+            'existencia' => 'integer',
+            'descuento' => 'decimal:2',
+            'estado' => 'boolean',
+        ];
+    }
 
     public function categoria()
     {

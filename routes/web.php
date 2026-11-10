@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ClienteController;
@@ -20,10 +21,97 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\TipoCambioController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\ProductoController as AdminProductoController;
+use App\Http\Controllers\Admin\ResourceController as AdminResourceController;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
 });
+Route::controller(AdminAuthController::class)
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/login', 'login')->name('login');
+
+        Route::post('/login', 'autenticar')->name('autenticar');
+
+        Route::post('/logout', 'logout')->name('logout');
+
+        Route::get('/', function () {
+            if (!session()->has('api_admin_token')) {
+                return redirect()->route('admin.login');
+            }
+
+            return view('admin.inicio');
+        })->name('inicio');
+
+    });
+
+// NUEVA RUTA: CONSULTAR PRODUCTOS MEDIANTE HTTP CLIENT
+Route::get('/admin/productos', [AdminProductoController::class, 'index'])
+    ->name('admin.productos.index');
+
+Route::get('/admin/productos/crear', [AdminProductoController::class, 'create'])
+    ->name('admin.productos.create');
+
+Route::post('/admin/productos', [AdminProductoController::class, 'store'])
+    ->name('admin.productos.store');
+
+Route::get('/admin/productos/{id}/editar', [AdminProductoController::class, 'edit'])
+    ->name('admin.productos.edit');
+
+Route::put('/admin/productos/{id}', [AdminProductoController::class, 'update'])
+    ->name('admin.productos.update');
+
+Route::delete('/admin/productos/{id}', [AdminProductoController::class, 'destroy'])
+    ->name('admin.productos.destroy');
+
+foreach ([
+    'roles',
+    'administradores',
+    'categorias',
+    'presentaciones',
+    'marcas',
+    'direcciones',
+    'metodos-pago',
+    'productos-pedido',
+    'repartidores',
+    'entregas',
+    'usuarios',
+    'proveedores',
+] as $recurso) {
+
+    Route::get("/admin/{$recurso}", function () use ($recurso) {
+        return app(AdminResourceController::class)->index($recurso);
+    })->name("admin.{$recurso}.index");
+
+    Route::get("/admin/{$recurso}/crear", function () use ($recurso) {
+        return app(AdminResourceController::class)->create($recurso);
+    })->name("admin.{$recurso}.create");
+
+    Route::post("/admin/{$recurso}", function (Request $request) use ($recurso) {
+    return app(AdminResourceController::class)->store($recurso, $request);
+})->name("admin.{$recurso}.store");
+
+    Route::get("/admin/{$recurso}/{id}", function ($id) use ($recurso) {
+        return app(AdminResourceController::class)->show($recurso, $id);
+    })->whereNumber('id')->name("admin.{$recurso}.show");
+
+    Route::get("/admin/{$recurso}/{id}/editar", function ($id) use ($recurso) {
+        return app(AdminResourceController::class)->edit($recurso, $id);
+    })->whereNumber('id')->name("admin.{$recurso}.edit");
+
+    Route::put("/admin/{$recurso}/{id}", function (Request $request, $id) use ($recurso) {
+        return app(AdminResourceController::class)->update($recurso, $request, $id);
+    })->whereNumber('id')->name("admin.{$recurso}.update");
+
+    Route::delete("/admin/{$recurso}/{id}", function ($id) use ($recurso) {
+        return app(AdminResourceController::class)->destroy($recurso, $id);
+    })->whereNumber('id')->name("admin.{$recurso}.destroy");
+}
 
 Route::view('/inicio','layouts/app');
 //Route::view('/clientes','/clientes/listado');
@@ -31,13 +119,39 @@ Route::view('/inicio','layouts/app');
 //Route::post('/admin/listado','administradores/listado');
 //Route::view('/info-producto','/productos/detalle');
 
-Route::get('/admin/listar',[AdministradorController::class,'listar']);
-Route::get('/admin/crear',[AdministradorController::class,'vistaFormulario']);
-Route::post('/admin/guardar',[AdministradorController::class,'registrar']);
-Route::get('/admin/editar',[AdministradorController::class,'vistaEdicion']);
-Route::put('/admin/actualizar',[AdministradorController::class,'actualizar']);
-Route::get('/admin/mostrar',[AdministradorController::class,'vistaMostrar']);
-Route::delete('/admin/borrar',[AdministradorController::class,'borrar']);
+Route::controller(AdministradorController::class)->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/listar', 'listar')->name('listar');
+    Route::get('/crear', 'vistaFormulario')->name('crear');
+    Route::post('/guardar', 'registrar')->name('guardar');
+
+    Route::get('/editar/{id}', function (Request $request, string $id) {
+        $request->merge(['id' => $id]);
+
+        return app(AdministradorController::class)->vistaEdicion($request);
+    })->whereNumber('id')->name('editar');
+    Route::get('/editar', 'vistaEdicion')->name('editar.legacy');
+
+    Route::put('/actualizar/{id}', function (Request $request, string $id) {
+        $request->merge(['id' => $id]);
+
+        return app(AdministradorController::class)->actualizar($request);
+    })->whereNumber('id')->name('actualizar');
+    Route::put('/actualizar', 'actualizar')->name('actualizar.legacy');
+
+    Route::get('/mostrar/{id}', function (Request $request, string $id) {
+        $request->merge(['id' => $id]);
+
+        return app(AdministradorController::class)->vistaMostrar($request);
+    })->whereNumber('id')->name('mostrar');
+    Route::get('/mostrar', 'vistaMostrar')->name('mostrar.legacy');
+
+    Route::delete('/borrar/{id}', function (Request $request, string $id) {
+        $request->merge(['id' => $id]);
+
+        return app(AdministradorController::class)->borrar($request);
+    })->whereNumber('id')->name('borrar');
+    Route::delete('/borrar', 'borrar')->name('borrar.legacy');
+});
 
 foreach ([
     'categorias' => CategoriaController::class,
@@ -54,15 +168,35 @@ foreach ([
     'roles' => RolController::class,
     'usuarios' => UserController::class,
 ] as $prefijo => $controlador) {
-    Route::controller($controlador)->prefix($prefijo)->name($prefijo.'.')->group(function () {
+    Route::controller($controlador)->prefix($prefijo)->name($prefijo.'.')->group(function () use ($controlador) {
         Route::get('/', 'listar')->name('index');
         Route::get('/listar', 'listar')->name('listar');
         Route::get('/crear', 'vistaFormulario')->name('formulario');
         Route::post('/guardar', 'registrar')->name('guardar');
-        Route::get('/editar', 'vistaEdicion')->name('editar');
-        Route::put('/actualizar', 'actualizar')->name('actualizar');
-        Route::get('/mostrar', 'vistaMostrar')->name('mostrar');
-        Route::delete('/borrar', 'borrar')->name('borrar');
+        Route::get('/editar/{id}', function (Request $request, string $id) use ($controlador) {
+            $request->merge(['id' => $id]);
+
+            return app($controlador)->vistaEdicion($request);
+        })->whereNumber('id')->name('editar');
+        Route::get('/editar', 'vistaEdicion')->name('editar.legacy');
+        Route::put('/actualizar/{id}', function (Request $request, string $id) use ($controlador) {
+            $request->merge(['id' => $id]);
+
+            return app($controlador)->actualizar($request);
+        })->whereNumber('id')->name('actualizar');
+        Route::put('/actualizar', 'actualizar')->name('actualizar.legacy');
+        Route::get('/mostrar/{id}', function (Request $request, string $id) use ($controlador) {
+            $request->merge(['id' => $id]);
+
+            return app($controlador)->vistaMostrar($request);
+        })->whereNumber('id')->name('mostrar');
+        Route::get('/mostrar', 'vistaMostrar')->name('mostrar.legacy');
+        Route::delete('/borrar/{id}', function (Request $request, string $id) use ($controlador) {
+            $request->merge(['id' => $id]);
+
+            return app($controlador)->borrar($request);
+        })->whereNumber('id')->name('borrar');
+        Route::delete('/borrar', 'borrar')->name('borrar.legacy');
     });
 }
 
@@ -111,3 +245,7 @@ Route::post('/prueba-cloudinary', function (
         200
     );
 });
+
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
+
+Route::get('/catalogo/{id}', [CatalogoController::class, 'detalle'])->name('catalogo.detalle');
